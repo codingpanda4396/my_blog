@@ -142,6 +142,16 @@ jobs:
             git checkout "${APP_BRANCH}"
             git pull --ff-only origin "${APP_BRANCH}"
 
+            if [ ! -f ".env" ]; then
+              if [ -f ".env.example" ]; then
+                echo ".env not found, creating from .env.example (please update production values on server)."
+                cp .env.example .env
+              else
+                echo ".env not found and .env.example is missing."
+                exit 1
+              fi
+            fi
+
             docker compose up -d --build
             docker compose ps
             EOF
