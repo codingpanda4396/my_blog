@@ -52,8 +52,16 @@ jobs:
                 echo "Set ECS_REPO like git@github.com:owner/repo.git"
                 exit 1
               fi
-              echo "No git repo found, cloning ${APP_REPO}..."
-              git clone "${APP_REPO}" .
+              if [ -z "$(ls -A .)" ]; then
+                echo "No git repo found, directory is empty, cloning ${APP_REPO}..."
+                git clone "${APP_REPO}" .
+              else
+                echo "No git repo found, directory is not empty, bootstrapping git repo..."
+                git init
+                git remote add origin "${APP_REPO}"
+                git fetch origin "${APP_BRANCH}"
+                git checkout -B "${APP_BRANCH}" "origin/${APP_BRANCH}"
+              fi
             fi
 
             git fetch origin "${APP_BRANCH}"
