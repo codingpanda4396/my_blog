@@ -58,6 +58,19 @@ jobs:
             APP_DIR="${{ secrets.ECS_APP_DIR }}"
             APP_BRANCH="${{ secrets.ECS_APP_BRANCH }}"
             APP_REPO="${{ secrets.ECS_REPO }}"
+            APP_GIT_TOKEN="${{ secrets.ECS_GIT_TOKEN }}"
+
+            AUTH_REPO="${APP_REPO}"
+            if [ -n "${APP_GIT_TOKEN}" ]; then
+              case "${APP_REPO}" in
+                git@github.com:*)
+                  AUTH_REPO="https://x-access-token:${APP_GIT_TOKEN}@github.com/${APP_REPO#git@github.com:}"
+                  ;;
+                https://github.com/*)
+                  AUTH_REPO="${APP_REPO/https:\/\/github.com\//https:\/\/x-access-token:${APP_GIT_TOKEN}@github.com\/}"
+                  ;;
+              esac
+            fi
 
             if [ -z "${APP_DIR}" ] || [ -z "${APP_BRANCH}" ]; then
               echo "ECS_APP_DIR or ECS_APP_BRANCH is empty."
@@ -86,19 +99,25 @@ jobs:
               case "${DIR_CONTENTS}" in
                 "")
                   echo "No git repo found, directory is empty, cloning ${APP_REPO}..."
-                  git clone "${APP_REPO}" .
+                  git clone "${AUTH_REPO}" .
                   ;;
                 *)
                   echo "No git repo found, directory is not empty, bootstrapping git repo..."
                   git init
-                  git remote add origin "${APP_REPO}"
-                  git fetch origin "${APP_BRANCH}"
+                  git remote add origin "${AUTH_REPO}"
+                  if ! git fetch origin "${APP_BRANCH}"; then
+                    echo "git fetch failed. If ECS_REPO uses git@github.com, configure ECS_GIT_TOKEN or add SSH deploy key on ECS host."
+                    exit 1
+                  fi
                   git checkout -B "${APP_BRANCH}" "origin/${APP_BRANCH}"
                   ;;
               esac
             fi
 
-            git fetch origin "${APP_BRANCH}"
+            if ! git fetch origin "${APP_BRANCH}"; then
+              echo "git fetch failed. If ECS_REPO uses git@github.com, configure ECS_GIT_TOKEN or add SSH deploy key on ECS host."
+              exit 1
+            fi
             git checkout "${APP_BRANCH}"
             git pull --ff-only origin "${APP_BRANCH}"
 
