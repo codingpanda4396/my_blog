@@ -36,18 +36,25 @@ jobs:
 
             APP_DIR="${{ secrets.ECS_APP_DIR }}"
             APP_BRANCH="${{ secrets.ECS_APP_BRANCH }}"
+            APP_REPO="${{ secrets.ECS_REPO }}"
 
             if [ -z "${APP_DIR}" ] || [ -z "${APP_BRANCH}" ]; then
               echo "ECS_APP_DIR or ECS_APP_BRANCH is empty."
               exit 1
             fi
 
-            if [ ! -d "${APP_DIR}" ]; then
-              echo "Directory not found: ${APP_DIR}"
-              exit 1
-            fi
-
+            mkdir -p "${APP_DIR}"
             cd "${APP_DIR}"
+
+            if [ ! -d ".git" ]; then
+              if [ -z "${APP_REPO}" ]; then
+                echo "Missing .git in ${APP_DIR}, and ECS_REPO is empty."
+                echo "Set ECS_REPO like git@github.com:owner/repo.git"
+                exit 1
+              fi
+              echo "No git repo found, cloning ${APP_REPO}..."
+              git clone "${APP_REPO}" .
+            fi
 
             git fetch origin "${APP_BRANCH}"
             git checkout "${APP_BRANCH}"
