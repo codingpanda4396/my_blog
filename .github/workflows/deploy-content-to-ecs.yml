@@ -152,10 +152,31 @@ jobs:
               fi
             fi
 
+            print_host_port_usage() {
+              echo "Host listeners on 80/443:"
+              if command -v ss >/dev/null 2>&1; then
+                ss -ltnp 2>/dev/null | awk 'NR==1 || /:80[[:space:]]/ || /:443[[:space:]]/'
+              elif command -v lsof >/dev/null 2>&1; then
+                lsof -nP -iTCP:80 -sTCP:LISTEN 2>/dev/null || true
+                lsof -nP -iTCP:443 -sTCP:LISTEN 2>/dev/null || true
+              else
+                echo "Neither ss nor lsof is available on host."
+              fi
+
+              if command -v systemctl >/dev/null 2>&1; then
+                for svc in nginx caddy apache2 httpd; do
+                  if systemctl is-active --quiet "${svc}"; then
+                    echo "Service ${svc} is active."
+                  fi
+                done
+              fi
+            }
+
             if ! docker compose up -d --build --remove-orphans; then
               echo "docker compose up failed. Showing containers publishing 80/443 for troubleshooting..."
               docker ps --filter "publish=80" --format 'table {{.ID}}\t{{.Names}}\t{{.Ports}}'
               docker ps --filter "publish=443" --format 'table {{.ID}}\t{{.Names}}\t{{.Ports}}'
+              print_host_port_usage
               exit 1
             fi
             docker compose ps
