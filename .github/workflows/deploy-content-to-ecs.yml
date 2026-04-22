@@ -22,6 +22,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate required secrets
+        env:
+          ECS_HOST: ${{ secrets.ECS_HOST }}
+          ECS_USER: ${{ secrets.ECS_USER }}
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+          ECS_PORT: ${{ secrets.ECS_PORT }}
+          ECS_APP_DIR: ${{ secrets.ECS_APP_DIR }}
+          ECS_APP_BRANCH: ${{ secrets.ECS_APP_BRANCH }}
+        run: |
+          set -euo pipefail
+          REQUIRED_VARS=(ECS_HOST ECS_USER ECS_SSH_KEY ECS_PORT ECS_APP_DIR ECS_APP_BRANCH)
+          for var in "${REQUIRED_VARS[@]}"; do
+            if [ -z "${!var:-}" ]; then
+              echo "Missing required secret: ${var}"
+              exit 1
+            fi
+          done
+
       - name: Deploy on ECS over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -30,9 +48,10 @@ jobs:
           key: ${{ secrets.ECS_SSH_KEY }}
           passphrase: ${{ secrets.ECS_SSH_PASSPHRASE }}
           port: ${{ secrets.ECS_PORT }}
+          debug: true
           script_stop: true
           script: |
-            set -euo pipefail
+            set -euxo pipefail
 
             APP_DIR="${{ secrets.ECS_APP_DIR }}"
             APP_BRANCH="${{ secrets.ECS_APP_BRANCH }}"
@@ -45,6 +64,12 @@ jobs:
 
             mkdir -p "${APP_DIR}"
             cd "${APP_DIR}"
+            pwd
+            ls -la
+
+            command -v git >/dev/null 2>&1 || { echo "git is not installed on remote host"; exit 1; }
+            command -v docker >/dev/null 2>&1 || { echo "docker is not installed on remote host"; exit 1; }
+            docker compose version >/dev/null 2>&1 || { echo "docker compose is not available on remote host"; exit 1; }
 
             if [ ! -d ".git" ]; then
               if [ -z "${APP_REPO}" ]; then
