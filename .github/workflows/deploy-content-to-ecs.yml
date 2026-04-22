@@ -51,7 +51,8 @@ jobs:
           debug: true
           script_stop: true
           script: |
-            set -euxo pipefail
+            bash -se <<'EOF'
+            set -euo pipefail
 
             APP_DIR="${{ secrets.ECS_APP_DIR }}"
             APP_BRANCH="${{ secrets.ECS_APP_BRANCH }}"
@@ -77,7 +78,9 @@ jobs:
                 echo "Set ECS_REPO like git@github.com:owner/repo.git"
                 exit 1
               fi
-              if [ -z "$(ls -A .)" ]; then
+
+              DIR_CONTENTS="$(ls -A . || true)"
+              if [ -z "${DIR_CONTENTS}" ]; then
                 echo "No git repo found, directory is empty, cloning ${APP_REPO}..."
                 git clone "${APP_REPO}" .
               else
@@ -95,3 +98,4 @@ jobs:
 
             docker compose up -d --build
             docker compose ps
+            EOF
