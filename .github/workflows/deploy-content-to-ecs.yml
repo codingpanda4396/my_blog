@@ -49,7 +49,7 @@ jobs:
           passphrase: ${{ secrets.ECS_SSH_PASSPHRASE }}
           port: ${{ secrets.ECS_PORT }}
           debug: true
-          script_stop: true
+          script_stop: false
           script: |
             bash -se <<'EOF'
             set -Eeuxo pipefail
@@ -83,16 +83,19 @@ jobs:
               fi
 
               DIR_CONTENTS="$(ls -A . || true)"
-              if [ -z "${DIR_CONTENTS}" ]; then
-                echo "No git repo found, directory is empty, cloning ${APP_REPO}..."
-                git clone "${APP_REPO}" .
-              else
-                echo "No git repo found, directory is not empty, bootstrapping git repo..."
-                git init
-                git remote add origin "${APP_REPO}"
-                git fetch origin "${APP_BRANCH}"
-                git checkout -B "${APP_BRANCH}" "origin/${APP_BRANCH}"
-              fi
+              case "${DIR_CONTENTS}" in
+                "")
+                  echo "No git repo found, directory is empty, cloning ${APP_REPO}..."
+                  git clone "${APP_REPO}" .
+                  ;;
+                *)
+                  echo "No git repo found, directory is not empty, bootstrapping git repo..."
+                  git init
+                  git remote add origin "${APP_REPO}"
+                  git fetch origin "${APP_BRANCH}"
+                  git checkout -B "${APP_BRANCH}" "origin/${APP_BRANCH}"
+                  ;;
+              esac
             fi
 
             git fetch origin "${APP_BRANCH}"
