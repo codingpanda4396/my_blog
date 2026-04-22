@@ -76,6 +76,10 @@ jobs:
               echo "ECS_APP_DIR or ECS_APP_BRANCH is empty."
               exit 1
             fi
+            if [ -z "${APP_REPO}" ]; then
+              echo "ECS_REPO is empty."
+              exit 1
+            fi
 
             mkdir -p "${APP_DIR}"
             cd "${APP_DIR}"
@@ -110,6 +114,23 @@ jobs:
                     exit 1
                   fi
                   git checkout -B "${APP_BRANCH}" "origin/${APP_BRANCH}"
+                  ;;
+              esac
+            fi
+
+            CURRENT_ORIGIN_URL="$(git remote get-url origin 2>/dev/null || true)"
+            if [ -n "${APP_GIT_TOKEN}" ]; then
+              if [ -z "${CURRENT_ORIGIN_URL}" ]; then
+                git remote add origin "${AUTH_REPO}"
+              elif [ "${CURRENT_ORIGIN_URL}" != "${AUTH_REPO}" ]; then
+                git remote set-url origin "${AUTH_REPO}"
+              fi
+            else
+              case "${CURRENT_ORIGIN_URL}" in
+                git@github.com:*)
+                  echo "Current origin uses SSH (${CURRENT_ORIGIN_URL}) but ECS_GIT_TOKEN is empty."
+                  echo "Configure ECS_GIT_TOKEN or install SSH deploy key on ECS host."
+                  exit 1
                   ;;
               esac
             fi
