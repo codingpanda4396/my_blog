@@ -52,7 +52,8 @@ jobs:
           script_stop: true
           script: |
             bash -se <<'EOF'
-            set -euo pipefail
+            set -Eeuxo pipefail
+            trap 'echo "FAILED at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
 
             APP_DIR="${{ secrets.ECS_APP_DIR }}"
             APP_BRANCH="${{ secrets.ECS_APP_BRANCH }}"
@@ -68,11 +69,13 @@ jobs:
             pwd
             ls -la
 
+            echo "Checking runtime dependencies..."
             command -v git >/dev/null 2>&1 || { echo "git is not installed on remote host"; exit 1; }
             command -v docker >/dev/null 2>&1 || { echo "docker is not installed on remote host"; exit 1; }
             docker compose version >/dev/null 2>&1 || { echo "docker compose is not available on remote host"; exit 1; }
 
             if [ ! -d ".git" ]; then
+              echo "No .git directory found under ${APP_DIR}."
               if [ -z "${APP_REPO}" ]; then
                 echo "Missing .git in ${APP_DIR}, and ECS_REPO is empty."
                 echo "Set ECS_REPO like git@github.com:owner/repo.git"
