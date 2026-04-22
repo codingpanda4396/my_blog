@@ -152,6 +152,11 @@ jobs:
               fi
             fi
 
-            docker compose up -d --build
+            if ! docker compose up -d --build --remove-orphans; then
+              echo "docker compose up failed. Showing containers publishing 80/443 for troubleshooting..."
+              docker ps --filter "publish=80" --format 'table {{.ID}}\t{{.Names}}\t{{.Ports}}'
+              docker ps --filter "publish=443" --format 'table {{.ID}}\t{{.Names}}\t{{.Ports}}'
+              exit 1
+            fi
             docker compose ps
             EOF
