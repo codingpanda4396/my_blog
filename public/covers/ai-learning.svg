@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">AI Learning Cover</title>
+  <desc id="desc">Minimal cover artwork for an article about AI learning.</desc>
+  <rect width="1200" height="630" fill="#f7f5f0"/>
+  <path d="M0 510 C240 450 360 570 600 510 C840 450 960 570 1200 510 L1200 630 L0 630 Z" fill="#d6d3d1"/>
+  <circle cx="320" cy="260" r="76" fill="none" stroke="#18181b" stroke-width="3"/>
+  <circle cx="470" cy="260" r="76" fill="none" stroke="#78716c" stroke-width="3"/>
+  <circle cx="620" cy="260" r="76" fill="none" stroke="#18181b" stroke-width="3"/>
+  <path d="M696 260 H880" stroke="#18181b" stroke-width="3" stroke-linecap="round"/>
+  <path d="M840 220 L880 260 L840 300" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="120" y="120" fill="#18181b" font-family="Arial, sans-serif" font-size="34" font-weight="700">AI Learning</text>
+  <text x="120" y="170" fill="#57534e" font-family="Arial, sans-serif" font-size="22">feedback loops over answer collecting</text>
+</svg>

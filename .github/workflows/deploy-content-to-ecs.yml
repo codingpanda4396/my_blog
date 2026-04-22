@@ -1,0 +1,56 @@
+name: Deploy Content To ECS
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "content/**"
+      - "public/covers/**"
+      - "docker-compose.yml"
+      - ".env.example"
+      - "Caddyfile"
+      - ".github/workflows/deploy-content-to-ecs.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-to-ecs
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on ECS over SSH
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.ECS_HOST }}
+        username: ${{ secrets.ECS_USER }}
+        key: ${{ secrets.ECS_SSH_KEY }}
+        port: ${{ secrets.ECS_PORT }}
+        script_stop: true
+        script: |
+          set -euo pipefail
+
+          APP_DIR="${{ secrets.ECS_APP_DIR }}"
+          APP_BRANCH="${{ secrets.ECS_APP_BRANCH }}"
+
+          if [ -z "${APP_DIR}" ] || [ -z "${APP_BRANCH}" ]; then
+            echo "ECS_APP_DIR or ECS_APP_BRANCH is empty."
+            exit 1
+          fi
+
+          if [ ! -d "${APP_DIR}" ]; then
+            echo "Directory not found: ${APP_DIR}"
+            exit 1
+          fi
+
+          cd "${APP_DIR}"
+
+          git fetch origin "${APP_BRANCH}"
+          git checkout "${APP_BRANCH}"
+          git pull --ff-only origin "${APP_BRANCH}"
+
+          docker compose up -d --build
+          docker compose ps

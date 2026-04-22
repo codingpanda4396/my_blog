@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Learning System Cover</title>
+  <desc id="desc">Minimal cover artwork for an article about learning systems.</desc>
+  <rect width="1200" height="630" fill="#fbfaf8"/>
+  <rect x="170" y="180" width="210" height="130" rx="10" fill="#e7e5e4" stroke="#292524" stroke-width="3"/>
+  <rect x="495" y="180" width="210" height="130" rx="10" fill="#f5f5f4" stroke="#292524" stroke-width="3"/>
+  <rect x="820" y="180" width="210" height="130" rx="10" fill="#e7e5e4" stroke="#292524" stroke-width="3"/>
+  <path d="M385 245 H485" stroke="#292524" stroke-width="3" stroke-linecap="round"/>
+  <path d="M710 245 H810" stroke="#292524" stroke-width="3" stroke-linecap="round"/>
+  <path d="M930 320 C900 450 300 450 270 320" fill="none" stroke="#78716c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M250 360 L270 320 L300 352" fill="none" stroke="#78716c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="120" y="120" fill="#18181b" font-family="Arial, sans-serif" font-size="34" font-weight="700">Learning System</text>
+  <text x="120" y="170" fill="#57534e" font-family="Arial, sans-serif" font-size="22">input, processing, output, review</text>
+</svg>
