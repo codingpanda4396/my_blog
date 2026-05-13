@@ -1,4 +1,4 @@
-name: Deploy Content To ECS
+name: Deploy To ECS
 
 on:
   push:
@@ -6,8 +6,17 @@ on:
       - master
       - main
     paths:
+      - "app/**"
+      - "components/**"
       - "content/**"
-      - "public/covers/**"
+      - "lib/**"
+      - "public/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "next.config.ts"
+      - "postcss.config.mjs"
+      - "Dockerfile"
       - "docker-compose.yml"
       - ".env.example"
       - "Caddyfile"

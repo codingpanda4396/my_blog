@@ -2,14 +2,14 @@ export const siteConfig = {
   url:
     process.env.SITE_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://mydomain.com",
+    "https://blog.pandaprivate.top",
   name:
     process.env.SITE_NAME ||
     process.env.NEXT_PUBLIC_SITE_NAME ||
-    "思想与工程笔记",
+    "熊猫",
   description:
     process.env.SITE_DESCRIPTION ||
-    "记录学习方法、产品思考、技术实践与长期主义的个人博客。",
+    "技术 × 哲学 × 商业 × AI — 西北大学学生，正在探索 AI、教育科技、校园商业与人的成长。",
 };
 
 export function absoluteUrl(path = "/") {
